@@ -577,6 +577,29 @@ class DiaperChangeForm(CoreModelForm, TaggableModelForm):
         }
 
 
+class EventForm(CoreModelForm, TaggableModelForm):
+    fieldsets = [
+        {"fields": ["child", "type", "time"], "layout": "required"},
+        {"fields": ["notes", "tags"], "layout": "advanced"},
+    ]
+
+    class Meta:
+        model = models.Event
+        fields = ["child", "type", "time", "notes", "tags"]
+        widgets = {
+            "child": ChildRadioSelect,
+            "type": PillRadioSelect(),
+            "time": DateTimeInput(),
+            "notes": forms.Textarea(attrs={"rows": 5}),
+        }
+
+
+class EventTypeForm(forms.ModelForm):
+    class Meta:
+        model = models.EventType
+        fields = ["name"]
+
+
 class FeedingForm(StashFeedingMixin, CoreModelForm, TaggableModelForm):
     fieldsets = [
         {

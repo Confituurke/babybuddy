@@ -58,6 +58,36 @@ class DiaperChangeViewSet(viewsets.ModelViewSet):
     ordering = "-time"
 
 
+class EventViewSet(viewsets.ModelViewSet):
+    queryset = models.Event.objects.all()
+    serializer_class = serializers.EventSerializer
+    filterset_class = filters.EventFilter
+    ordering_fields = ("time",)
+    ordering = "-time"
+
+
+class EventTypeViewSet(viewsets.ModelViewSet):
+    queryset = models.EventType.objects.all()
+    serializer_class = serializers.EventTypeSerializer
+    lookup_field = "slug"
+    filterset_fields = ("name", "slug")
+    ordering_fields = ("name", "slug")
+    ordering = "name"
+
+    def destroy(self, request, *args, **kwargs):
+        """
+        Delete an event type. A type that is still used by events can not be
+        deleted.
+        """
+        try:
+            return super().destroy(request, *args, **kwargs)
+        except ProtectedError:
+            return Response(
+                {"detail": "This event type is used by events and can not be deleted."},
+                status=status.HTTP_409_CONFLICT,
+            )
+
+
 class FeedingViewSet(viewsets.ModelViewSet):
     # stash_discarded/stash_discard_reason read the linked stash_adjustments;
     # prefetch them so the list/retrieve views don't issue one query per row.

@@ -90,6 +90,54 @@ class ViewsTestCase(TestCase):
         self.assertEqual(page.status_code, 200)
         self.assertContains(page, "column-parent")
 
+    def test_event_views(self):
+        page = self.c.get("/events/")
+        self.assertEqual(page.status_code, 200)
+        self.assertContains(page, "/event-types/")
+        page = self.c.get("/events/add/")
+        self.assertEqual(page.status_code, 200)
+
+        entry = models.Event.objects.first()
+        page = self.c.get("/events/{}/".format(entry.id))
+        self.assertEqual(page.status_code, 200)
+        page = self.c.get("/events/{}/delete/".format(entry.id))
+        self.assertEqual(page.status_code, 200)
+
+    def test_event_list_filters(self):
+        child = models.Child.objects.first()
+        bath = models.EventType.objects.create(name="Filter bath")
+        nail_trim = models.EventType.objects.create(name="Filter nail trim")
+        time = timezone.localtime() - timezone.timedelta(days=3)
+        models.Event.objects.create(child=child, type=bath, time=time)
+        models.Event.objects.create(
+            child=child, type=nail_trim, time=time - timezone.timedelta(days=3)
+        )
+
+        page = self.c.get("/events/", {"type": bath.id, "filtered": 1})
+        self.assertEqual(page.status_code, 200)
+        self.assertEqual([e.type for e in page.context["object_list"]], [bath])
+
+        date = time.date().isoformat()
+        page = self.c.get(
+            "/events/", {"date_min": date, "date_max": date, "filtered": 1}
+        )
+        self.assertEqual(page.status_code, 200)
+        types = {e.type for e in page.context["object_list"]}
+        self.assertIn(bath, types)
+        self.assertNotIn(nail_trim, types)
+
+    def test_eventtype_views(self):
+        page = self.c.get("/event-types/")
+        self.assertEqual(page.status_code, 200)
+        page = self.c.get("/event-types/add/")
+        self.assertEqual(page.status_code, 200)
+
+        entry = models.EventType.objects.first()
+        page = self.c.get("/event-types/{}/".format(entry.slug))
+        self.assertEqual(page.status_code, 200)
+        page = self.c.get("/event-types/{}/delete/".format(entry.slug))
+        self.assertEqual(page.status_code, 200)
+
     def test_feeding_views(self):
         page = self.c.get("/feedings/")
         self.assertEqual(page.status_code, 200)
@@ -332,6 +380,11 @@ class TimelinePermissionsTestCase(TestCase):
             child=self.child, note="Timeline private note", time=now
         )
         models.Temperature.objects.create(child=self.child, temperature=38.9, time=now)
+        models.Event.objects.create(
+            child=self.child,
+            type=models.EventType.objects.create(name="Timeline bath"),
+            time=now,
+        )
         models.TummyTime.objects.create(
             child=self.child, start=now, end=now + timezone.timedelta(minutes=5)
         )
@@ -379,12 +432,13 @@ class TimelinePermissionsTestCase(TestCase):
 
         model_names = self._model_names(page)
         self.assertIn("feeding", model_names)
-        for excluded in ["medication", "note", "temperature", "tummytime"]:
+        for excluded in ["event", "medication", "note", "temperature", "tummytime"]:
             self.assertNotIn(excluded, model_names)
 
         content = page.content.decode()
         self.assertNotIn("Timeline Medication", content)
         self.assertNotIn("Timeline private note", content)
+        self.assertNotIn("Timeline bath", content)
 
     def test_read_only_user_sees_the_whole_timeline(self):
         self._login("readonly", read_only=True)
@@ -395,10 +449,12 @@ class TimelinePermissionsTestCase(TestCase):
         self.assertIn("feeding", model_names)
         self.assertIn("medication", model_names)
         self.assertIn("note", model_names)
+        self.assertIn("event", model_names)
 
         content = page.content.decode()
         self.assertIn("Timeline Medication", content)
         self.assertIn("Timeline private note", content)
+        self.assertIn("Timeline bath", content)
 
 
 class ParentDetailPermissionsTestCase(TestCase):
