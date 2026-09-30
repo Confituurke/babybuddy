@@ -2,6 +2,7 @@
 
 import core.models
 import django.db.models.deletion
+import django.db.models.functions.text
 import django.utils.timezone
 from django.db import migrations, models
 
@@ -27,7 +28,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "name",
-                    models.CharField(max_length=255, unique=True, verbose_name="Name"),
+                    models.CharField(max_length=100, unique=True, verbose_name="Name"),
                 ),
                 (
                     "slug",
@@ -43,7 +44,7 @@ class Migration(migrations.Migration):
             options={
                 "verbose_name": "Event Type",
                 "verbose_name_plural": "Event Types",
-                "ordering": ["name"],
+                "ordering": [django.db.models.functions.text.Lower("name")],
                 "default_permissions": ("view", "add", "change", "delete"),
             },
         ),

@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 import re
+import warnings
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.core.management import call_command
 from django.db import connection
+from django.core.paginator import UnorderedObjectListWarning
 from django.test import TestCase
 from django.test.utils import CaptureQueriesContext
 from django.test import Client as HttpClient
@@ -117,14 +119,18 @@ class ViewsTestCase(TestCase):
         self.assertEqual(page.status_code, 200)
         self.assertEqual([e.type for e in page.context["object_list"]], [bath])
 
-        date = time.date().isoformat()
-        page = self.c.get(
-            "/events/", {"date_min": date, "date_max": date, "filtered": 1}
-        )
+        bath_event = models.Event.objects.filter(type=bath).get()
+        bath_event.tags.add("filter-tag")
+        tag = models.Tag.objects.get(name="filter-tag")
+        page = self.c.get("/events/", {"tag": tag.pk, "filtered": 1})
         self.assertEqual(page.status_code, 200)
-        types = {e.type for e in page.context["object_list"]}
-        self.assertIn(bath, types)
-        self.assertNotIn(nail_trim, types)
+        self.assertEqual(list(page.context["object_list"]), [bath_event])
+
+        # The web list filters on child, type and tags only; dates are an API
+        # filter.
+        self.assertEqual(
+            sorted(page.context["filter"].form.fields), ["child", "tag", "type"]
+        )
 
     def test_eventtype_views(self):
         page = self.c.get("/event-types/")
@@ -137,6 +143,17 @@ class ViewsTestCase(TestCase):
         self.assertEqual(page.status_code, 200)
         page = self.c.get("/event-types/{}/delete/".format(entry.slug))
         self.assertEqual(page.status_code, 200)
+
+    def test_eventtype_list_is_sorted_by_name(self):
+        models.EventType.objects.create(name="brushing teeth")
+        models.EventType.objects.create(name="Sunscreen")
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", UnorderedObjectListWarning)
+            page = self.c.get("/event-types/")
+        self.assertEqual(page.status_code, 200)
+        names = [t.name for t in page.context["object_list"]]
+        self.assertIn("brushing teeth", names)
+        self.assertEqual(names, sorted(names, key=str.lower))
 
     def test_feeding_views(self):
         page = self.c.get("/feedings/")
