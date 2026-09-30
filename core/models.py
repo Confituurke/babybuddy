@@ -426,6 +426,8 @@ class Feeding(models.Model):
     # Every method except breastfeeding: expressed milk the baby drinks.
     STASH_METHODS = ("bottle", "parent fed", "self fed")
     BREAST_METHODS = ("left breast", "right breast", "both breasts")
+    # Feeding types that never come from the breast.
+    NOT_FROM_THE_BREAST = ("formula", "solid food")
 
     child = models.ForeignKey(
         "Child",
@@ -508,6 +510,11 @@ class Feeding(models.Model):
         validate_time(self.start, "start")
         validate_duration(self)
         validate_unique_period(Feeding.objects.filter(child_id=self.child_id), self)
+        if self.type in self.NOT_FROM_THE_BREAST and self.method in self.BREAST_METHODS:
+            raise ValidationError(
+                {"method": _("Formula and solid food can't be given from the breast.")},
+                code="method_not_for_type",
+            )
         if self.parent_id and self.method not in self.BREAST_METHODS:
             raise ValidationError(
                 {"parent": _("Only a breastfeeding method can have a parent.")},
