@@ -136,6 +136,23 @@ Returns JSON data in the response body in the following format:
 - `previous`: URL for the previous set of results.
 - `results`: An array of the results of the request.
 
+The list of event types (`/api/event-types/`) has one more key on every page,
+`permissions`, which tells a client whether the user may add, change and delete
+event types. A client can use it to decide which management options to show,
+instead of working out the user's permissions itself:
+
+```json
+{
+  "count": 3,
+  "next": null,
+  "previous": null,
+  "permissions": { "add": true, "change": true, "delete": false },
+  "results": [{...}]
+}
+```
+
+A single event type does not include `permissions`.
+
 For single entries, returns JSON data in the response body keyed by model field
 names. This will vary between models.
 
@@ -263,13 +280,34 @@ Also note that the timer has been deleted.
 ### Events
 
 Events record something that happened at a moment, of a type that is defined on
-the instance itself (e.g. "Bath" or "Nail trim"). The types are managed through
-`/api/event-types/`, where each type has an `id`, a `name` and a `slug`. The slug
-is generated from the name when the type is created and is used to look a type
-up, e.g. `/api/event-types/nail-trim/`. The slug stays the same when the type is
-renamed, so anything that refers to a type by its slug keeps working. To find a
-type by its ID (webhooks send the ID), filter the list with `id`, e.g.
-`/api/event-types/?id=2`.
+the instance itself (e.g. "Nail trim" or "Tooth brushing"). The types are managed
+through `/api/event-types/`, where each type has an `id`, a `name`, a `slug` and
+an `emoji`. The slug is generated from the name when the type is created and is
+used to look a type up, e.g. `/api/event-types/nail-trim/`. The slug stays the
+same when the type is renamed, so anything that refers to a type by its slug
+keeps working. To find a type by its ID (webhooks send the ID), filter the list
+with `id`, e.g. `/api/event-types/?id=2`.
+
+The `emoji` of a type is optional and is an empty string when it is not set. It
+is shown with the type's events, so events themselves have no emoji field. It
+must be a single emoji (e.g. `"✂️"`, `"👍🏽"` or a flag); anything else, such as
+text or two emoji, is refused with `400 Bad Request`:
+
+```shell
+curl --location --request POST '[...]/api/event-types/' \
+--header 'Authorization: Token [...]' \
+--header 'Content-Type: application/json' \
+--data-raw '{"name": "Nail trim", "emoji": "✂️"}'
+```
+
+```json
+{
+  "id": 2,
+  "name": "Nail trim",
+  "slug": "nail-trim",
+  "emoji": "✂️"
+}
+```
 
 The `type` field of an event is the **slug** of its event type, not its ID. The
 `time` field is optional and defaults to the time the request is received, so
@@ -280,14 +318,14 @@ the type:
 curl --location --request POST '[...]/api/events/' \
 --header 'Authorization: Token [...]' \
 --header 'Content-Type: application/json' \
---data-raw '{"child": 1, "type": "bath"}'
+--data-raw '{"child": 1, "type": "nail-trim"}'
 ```
 
 ```json
 {
   "id": 12,
   "child": 1,
-  "type": "bath",
+  "type": "nail-trim",
   "time": "2024-05-28T19:30:02.112233-04:00",
   "notes": null,
   "tags": []

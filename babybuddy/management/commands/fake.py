@@ -65,8 +65,14 @@ class Command(BaseCommand):
         # get_or_create so running the command again (e.g. to add more fake
         # children) reuses the same fake parent instead of colliding on name.
         self.parent, _ = models.Parent.objects.get_or_create(first_name="Robin")
-        for name in ["Bath", "Nail trim", "Pajama change"]:
-            event_type = models.EventType.objects.get_or_create(name=name)[0]
+        for name, emoji in [
+            ("Nail trim", "✂️"),
+            ("Sunscreen", "🧴"),
+            ("Tooth brushing", "🪥"),
+        ]:
+            event_type = models.EventType.objects.get_or_create(
+                name=name, defaults={"emoji": emoji}
+            )[0]
             self.event_types.append(event_type)
 
         birth_date = timezone.localtime() - timedelta(days=days)

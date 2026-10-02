@@ -16,21 +16,31 @@ amount, etc. When complete, select Submit.
 ### Event
 
 Events are for everything else that happens at a moment and is worth keeping
-track of, such as a bath, a pajama change or a nail trim. Each event has a
-type, and the list of types is up to you.
+track of, such as a nail trim, tooth brushing or putting on sunscreen. Each
+event has a type, and the list of types is up to you.
 
 To set up the types, select Activities and then Events from the top navigation
-bar, and select Event Types. Select Add Event Type and enter a name, e.g. "Bath"
-or "Nail trim". A type that is in use by events can be renamed, but not deleted.
-Renaming a type keeps its slug (the short name in its address, e.g. `nail-trim`),
-so buttons and other integrations that refer to it keep working.
+bar, and select Event Types. Select Add Event Type and enter a name, e.g. "Nail
+trim" or "Tooth brushing". A type can also have an emoji, e.g. ✂️ or 🪥, which
+is shown before its name wherever its events appear: in the event list, on the
+event form, in the timeline and on the child dashboard. The emoji is optional
+and must be a single emoji; use your device's emoji keyboard to enter it. A type
+that is in use by events can be renamed, but not deleted. Renaming a type keeps
+its slug (the short name in its address, e.g. `nail-trim`), so buttons and other
+integrations that refer to it keep working.
 
 To add an event, select the plus sign in the top navigation bar and select
 Event. If necessary, modify the child or the time, and select the type of the
 event. Add any notes or tags and select Submit.
 
-The child dashboard shows how long ago the last event of each type was, and
-the Events per Day report shows how often each type was recorded.
+The Last Events card on the child dashboard lists the child's five most recent
+events of any type, newest first, with how long ago each one was; its title
+shows how long ago the newest one was. The same type can appear more than once.
+If you can edit events, select one to edit it. The card follows the dashboard
+setting that hides older data: when the child only has older events, it shows
+"No recent events", or it is hidden when the "Hide Empty Dashboard Cards"
+setting is on. The card is not shown for a child without any events. The Events
+per Day report shows how often each type was recorded.
 
 ### Feeding
 
