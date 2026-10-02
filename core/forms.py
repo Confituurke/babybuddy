@@ -604,6 +604,50 @@ class EventTypeForm(forms.ModelForm):
         fields = ["name", "emoji"]
 
 
+class EventTypeDeleteForm(forms.Form):
+    """
+    Confirms deleting an event type. A type that is used by events is only
+    deleted with its events, by a user who may delete events, after confirming
+    the number of events that was shown.
+    """
+
+    delete_events = forms.BooleanField(
+        required=False, label=_("Delete the events of this type too")
+    )
+    event_count = forms.IntegerField(required=False, widget=forms.HiddenInput)
+
+    def __init__(self, *args, event_type, user, **kwargs):
+        self.event_type = event_type
+        self.user = user
+        # The number of events the user confirmed deleting, set by clean().
+        self.confirmed_event_count = 0
+        super().__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        count = self.event_type.events.count()
+        if count == 0:
+            return cleaned_data
+        if not self.user.has_perm("core.delete_event"):
+            raise forms.ValidationError(
+                _("%(name)s is still in use and can not be deleted.")
+                % {"name": self.event_type}
+            )
+        if not cleaned_data.get("delete_events"):
+            raise forms.ValidationError(
+                _("Confirm that the events of this type will be deleted too.")
+            )
+        if cleaned_data.get("event_count") != count:
+            raise forms.ValidationError(
+                _(
+                    "The number of events of this type has changed. Check it and "
+                    "confirm again."
+                )
+            )
+        self.confirmed_event_count = count
+        return cleaned_data
+
+
 class FeedingForm(StashFeedingMixin, CoreModelForm, TaggableModelForm):
     fieldsets = [
         {

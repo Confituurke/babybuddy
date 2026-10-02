@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
+from django.db import transaction
 from django.db.models import Count, ProtectedError
 from django.db.models.functions import Lower
 from django.forms import Form, ValidationError
@@ -269,21 +270,56 @@ class EventTypeUpdate(CoreUpdateView):
     success_url = reverse_lazy("core:eventtype-list")
 
 
+class EventsChanged(Exception):
+    """
+    The events of a type changed after the user confirmed deleting them.
+    """
+
+
 class EventTypeDelete(CoreDeleteView):
     model = models.EventType
+    form_class = forms.EventTypeDeleteForm
     permission_required = ("core.delete_eventtype",)
     success_url = reverse_lazy("core:eventtype-list")
 
     def get_queryset(self):
         return super().get_queryset().annotate(Count("events"))
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({"event_type": self.object, "user": self.request.user})
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["can_delete_events"] = self.request.user.has_perm("core.delete_event")
+        return context
+
     def form_valid(self, form):
-        # An event type still in use is protected from deletion; the template
-        # explains this instead of offering the button, and this covers events
-        # that were added after the page was opened.
+        # The type goes together with the events the user confirmed, or
+        # nothing goes. Locking the type keeps events from being added to it
+        # meanwhile, where the database supports it.
         try:
-            return super().form_valid(form)
+            with transaction.atomic():
+                event_type = models.EventType.objects.select_for_update().get(
+                    pk=self.object.pk
+                )
+                if form.confirmed_event_count:
+                    if event_type.events.count() != form.confirmed_event_count:
+                        raise EventsChanged
+                    event_type.events.all().delete()
+                return super().form_valid(form)
+        except EventsChanged:
+            messages.error(
+                self.request,
+                _(
+                    "The number of events of this type has changed. Check it and "
+                    "confirm again."
+                ),
+            )
+            return HttpResponseRedirect(self.request.path)
         except ProtectedError:
+            # Covers events that were added after the form was checked.
             messages.error(
                 self.request,
                 _("%(name)s is still in use and can not be deleted.")
