@@ -3649,7 +3649,24 @@ msgstr "Aantal gebeurtenissen"
 msgid "Allows adding and editing care entries (feedings, diaper changes, sleep, timers, medication, temperature, weight, notes, tummy time and events) for every child. Cannot delete entries or reach pumping, height, BMI, head circumference, user management or settings."
 msgstr "Mag verzorgingsregistraties (voedingen, luierwissels, slaap, timers, medicatie, temperatuur, gewicht, notities, buiktijd en gebeurtenissen) toevoegen en bewerken voor elk kind. Kan geen registraties verwijderen en heeft geen toegang tot kolven, lengte, BMI, hoofdomtrek, gebruikersbeheer of instellingen."
 
-msgid "There is 1 event of this type."
+msgid "There is %(count)s event of this type."
 msgid_plural "There are %(count)s events of this type."
-msgstr[0] "Er is 1 gebeurtenis van dit type."
+msgstr[0] "Er is %(count)s gebeurtenis van dit type."
 msgstr[1] "Er zijn %(count)s gebeurtenissen van dit type."
+
+msgid "This will also delete %(count)s event of this type."
+msgid_plural "This will also delete %(count)s events of this type."
+msgstr[0] "Dit verwijdert ook %(count)s gebeurtenis van dit type."
+msgstr[1] "Dit verwijdert ook %(count)s gebeurtenissen van dit type."
+
+msgid "This can't be undone."
+msgstr "Dit kan niet ongedaan gemaakt worden."
+
+msgid "Delete the events of this type too"
+msgstr "Verwijder ook de gebeurtenissen van dit type"
+
+msgid "Confirm that the events of this type will be deleted too."
+msgstr "Bevestig dat de gebeurtenissen van dit type ook verwijderd worden."
+
+msgid "The number of events of this type has changed. Check it and confirm again."
+msgstr "Het aantal gebeurtenissen van dit type is gewijzigd. Controleer het en bevestig opnieuw."
