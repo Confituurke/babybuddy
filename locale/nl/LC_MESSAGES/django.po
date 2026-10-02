@@ -3560,3 +3560,96 @@ msgstr "Melkvoorraad in en uit"
 #: reports/templates/reports/stash_use.html:10
 msgid "Milk From the Stash per Baby"
 msgstr "Melk uit de voorraad per baby"
+
+#. Generic events (beta/integration)
+msgid "Event"
+msgstr "Gebeurtenis"
+
+msgid "Events"
+msgstr "Gebeurtenissen"
+
+msgid "Enter a single emoji."
+msgstr "Voer één emoji in."
+
+msgid "A single emoji shown with this type's events"
+msgstr "Eén emoji die bij de gebeurtenissen van dit type wordt getoond"
+
+msgid "Emoji"
+msgstr "Emoji"
+
+msgid "Event Type"
+msgstr "Gebeurtenistype"
+
+msgid "Event Types"
+msgstr "Gebeurtenistypes"
+
+msgid "Name must contain at least one letter or number."
+msgstr "De naam moet minstens één letter of cijfer bevatten."
+
+msgid "An event type with a similar name already exists."
+msgstr "Er bestaat al een gebeurtenistype met een gelijkaardige naam."
+
+msgid "Delete an Event"
+msgstr "Een gebeurtenis verwijderen"
+
+msgid "Update an Event"
+msgstr "Een gebeurtenis bijwerken"
+
+msgid "Add an Event"
+msgstr "Een gebeurtenis toevoegen"
+
+msgid "There are no event types yet."
+msgstr "Er zijn nog geen gebeurtenistypes."
+
+msgid "Add an event type"
+msgstr "Een gebeurtenistype toevoegen"
+
+msgid "Add Event"
+msgstr "Gebeurtenis toevoegen"
+
+msgid "No events found."
+msgstr "Geen gebeurtenissen gevonden."
+
+msgid "Delete an Event Type"
+msgstr "Een gebeurtenistype verwijderen"
+
+msgid "An event type can only be deleted when no events use it. Delete or change those events first."
+msgstr "Een gebeurtenistype kan pas verwijderd worden als geen enkele gebeurtenis het nog gebruikt. Verwijder of wijzig die gebeurtenissen eerst."
+
+msgid "Update an Event Type"
+msgstr "Een gebeurtenistype bijwerken"
+
+msgid "Add an Event Type"
+msgstr "Een gebeurtenistype toevoegen"
+
+msgid "Add Event Type"
+msgstr "Gebeurtenistype toevoegen"
+
+msgid "No event types found."
+msgstr "Geen gebeurtenistypes gevonden."
+
+msgid "%(type)s for %(child)s."
+msgstr "%(type)s voor %(child)s."
+
+msgid "%(name)s is still in use and can not be deleted."
+msgstr "%(name)s is nog in gebruik en kan niet verwijderd worden."
+
+msgid "Last Events"
+msgstr "Laatste gebeurtenissen"
+
+msgid "No recent events"
+msgstr "Geen recente gebeurtenissen"
+
+msgid "Events per Day"
+msgstr "Gebeurtenissen per dag"
+
+msgid "Number of events"
+msgstr "Aantal gebeurtenissen"
+
+msgid "Allows adding and editing care entries (feedings, diaper changes, sleep, timers, medication, temperature, weight, notes, tummy time and events) for every child. Cannot delete entries or reach pumping, height, BMI, head circumference, user management or settings."
+msgstr "Mag verzorgingsregistraties (voedingen, luierwissels, slaap, timers, medicatie, temperatuur, gewicht, notities, buiktijd en gebeurtenissen) toevoegen en bewerken voor elk kind. Kan geen registraties verwijderen en heeft geen toegang tot kolven, lengte, BMI, hoofdomtrek, gebruikersbeheer of instellingen."
+
+msgid "There is 1 event of this type."
+msgid_plural "There are %(count)s events of this type."
+msgstr[0] "Er is 1 gebeurtenis van dit type."
+msgstr[1] "Er zijn %(count)s gebeurtenissen van dit type."
